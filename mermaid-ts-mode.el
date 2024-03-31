@@ -58,6 +58,11 @@
     table)
   "Syntax table for `mermaid-ts-mode'.")
 
+(defcustom mermaid-ts-cmd "mmdc"
+  "Command to run the Mermaid CLI."
+  :type 'string
+  :group 'mermaid-ts)
+
 (defvar mermaid-ts--treesit-font-lock-rules
   (treesit-font-lock-rules
 
@@ -148,6 +153,30 @@
      ((parent-is "class_stmt_class") parent-bol mermaid-ts-indent-level)
      ((parent-is "subgraph") parent-bol mermaid-ts-indent-level))))
 
+(defun mermaid-ts-render-and-display ()
+  "Render the current Mermaid diagram and display it in another window."
+  (interactive)
+  (when (and (buffer-modified-p)
+             (y-or-n-p "Buffer modified. Save before rendering? "))
+    (save-buffer))
+  (let* ((input-file (buffer-file-name))
+         (output-file (concat input-file ".svg"))
+         (output-buffer (get-file-buffer output-file))
+         (command (format "%s -i \"%s\""
+                          (shell-quote-argument mermaid-ts-cmd)
+                          (shell-quote-argument input-file))))
+    (if input-file
+        (let ((exit-status (shell-command command)))
+          (if (and (equal exit-status 0) (file-exists-p output-file))
+              (if output-buffer
+                  (progn
+                    (pop-to-buffer output-buffer)
+                    (with-current-buffer output-buffer (revert-buffer t t t)))
+                (progn
+                  (other-window 1)
+                  (find-file output-file)))
+            (message "Mermaid failed to generate the SVG; exit status: %s" exit-status)))
+      (message "Buffer is not associated with a file."))))
 ;;;###autoload
 (define-derived-mode mermaid-ts-mode prog-mode "Mermaid"
   :group 'mermaid-ts
