@@ -153,6 +153,9 @@
      ((parent-is "class_stmt_class") parent-bol mermaid-ts-indent-level)
      ((parent-is "subgraph") parent-bol mermaid-ts-indent-level))))
 
+(defvar-keymap mermaid-ts-mode-map
+  :doc "Keymap used in Mermaid buffers.")
+
 (defun mermaid-ts-render-and-display ()
   "Render the current Mermaid diagram and display it in another window."
   (interactive)
@@ -179,6 +182,12 @@
       (message "Buffer is not associated with a file."))))
 ;;;###autoload
 (define-derived-mode mermaid-ts-mode prog-mode "Mermaid"
+  "Major mode for editing Mermaid diagrams, using tree-sitter
+
+Key bindings:
+
+\\{mermaid-ts-mode-map}"
+
   :group 'mermaid-ts
   :syntax-table mermaid-ts--syntax-table
   
