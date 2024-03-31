@@ -204,6 +204,11 @@ Key bindings:
   (setq-local treesit-font-lock-settings mermaid-ts--treesit-font-lock-rules)
   
   (treesit-major-mode-setup))
-   
+
+;;;###autoload
+(add-to-list 'auto-mode-alist
+             (cons "\\.mmd$" 'mermaid-ts-mode))
+
+
 (provide 'mermaid-ts-mode)
 ;;; mermaid-ts-mode.el ends here
